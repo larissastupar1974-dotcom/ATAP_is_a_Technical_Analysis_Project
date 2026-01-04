@@ -37,7 +37,8 @@ public class DataBentoTest(ITestOutputHelper output)
     [Fact]
     public void TestConvertToStandardDtos()
     {
-        this.ConvertToStandardDtos(FilePath);
+        List<Ohlcv> all = this.ConvertToStandardDtos(FilePath);
+        List<Ohlcv> dec25 = [..all.Where(c => c.Symbol == "TFM FMZ0025!" && c.Close != null).GroupBy(d => d.TimeStamp).Select(e => e.First())];
     }
 
     /// <summary>
@@ -145,12 +146,12 @@ public class DataBentoTest(ITestOutputHelper output)
         }
     }
 
-    private void ConvertToStandardDtos(string filePath)
+    private List<Ohlcv> ConvertToStandardDtos(string filePath)
     {
         if (TryGetRecordsFromAbsoluteFilePath(filePath, out var records))
         {
             output.WriteLine("Got records.");
-            List<Ohlcv> converted = [.. records.Select(r => DataBentoConverter.ConvertOhlcv(r))];
+            return [.. records.Select(r => DataBentoConverter.ConvertOhlcv(r))];
         }
         else
         {
